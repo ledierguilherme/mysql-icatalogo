@@ -1,3 +1,18 @@
+<?php 
+
+    require('../database/conexao.php');
+
+    $sql = "SELECT prod.*, cate.descricao FROM tbl_produto prod
+            INNER JOIN tbl_categoria cate ON
+            prod.categoria_id = cate.id;";
+
+    $resultado = mysqli_query($conexao, $sql);
+
+//  TESTE DE SELEÇÃO DE DADOS
+//  var_dump($resultado);exit;
+?>
+
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -32,6 +47,12 @@
 
                 <!-- LISTAGEM DE PRODUTOS (INICIO) -->
 
+                <?php
+                
+                    while ($produto = mysqli_fetch_array($resultado)) {
+                    
+                ?>
+
                 <article class="card-produto">
 
                        <div class="acoes-produtos">
@@ -40,7 +61,7 @@
                     </div>
     
                 <figure>
-                     <img src="" />
+                     <img src="fotos/<?php echo $produto["imagem"] ?>" />
                 </figure>
 
                 <section>
@@ -56,13 +77,15 @@
                         </em>
                     </span>
 
-                    <span class="descricao"></span>
+                    <span class="descricao">descrição</span>
 
                     <span class="categoria">
-                        <em></em>
+                        <em>cat</em>
                      </span>
 
                 </article>
+
+                <?php } ?>
 
                 </section>
 
