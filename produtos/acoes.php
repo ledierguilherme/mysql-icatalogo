@@ -113,7 +113,7 @@
         // var_dump($erros);
         // echo '</pre>';
         // exit;
-        
+
         return $erros;
 
     }
@@ -171,6 +171,60 @@
             header('location: index.php');
 
             break;
+
+            case "deletar":
+
+                $produtoId = $_POST["produtoId"];
+
+                $sql = "SELECT imagem FROM tbl_produto WHERE id = $produtoId";
+
+                $resultado = mysqli_query($conexao, $sql);
+
+                $produto = mysqli_fetch_array($resultado);
+
+                //echo $produto[0];exit;
+
+                $sql = "DELETE FROM tbl_produto WHERE id = $produtoId";
+
+                $resultado = mysqli_query($conexao, $sql);
+
+                unlink("./fotos/" . $produto[0]);
+
+                header("location: index.php");
+
+                break;
+
+            case "editar":
+
+                $produtoId = $_POST["produtoId"];
+                if($_FILES["foto"]["error"] != UPLOAD_ERR_NO_FILE){
+
+                    $sqlImagem = "SELECT imagem FROM tbl_produto WHERE id = $produtoId";
+
+                    $resultado = mysqli_query($conexao, $sqlImagem);
+                    echo $sqlImagem;
+                    $produto = mysqli_fetch_array($resultado);
+
+                    echo '/fotos/' . $produto["imagem"];exit;
+
+                }
+
+
+                $descricao = $_POST["descricao"];
+                $peso = str_replace(".", "", $_POST ["peso"]);
+                $peso = str_replace(",", "." , $_POST["peso"]);
+
+                $valor = str_replace(".", "", $_POST ["valor"]);
+                $valor = str_replace(",", "." , $_POST["valor"]);   
+                
+                $quantidade = $_POST ["quantidade"];
+                $cor = $_POST ["cor"];
+                $tamanho = $_POST ["tamanho"];
+                $desconto = $_POST ["desconto"];
+                $categoria = $_POST ["categoria"];
+
+
+                
         
         default:
             # code...
