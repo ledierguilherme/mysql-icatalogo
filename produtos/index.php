@@ -1,16 +1,16 @@
 <?php
 
-require('../database/conexao.php');
+    require('../database/conexao.php');
 
-$sql = "SELECT p.*, c.descricao FROM tbl_produto p
-    INNER JOIN tbl_categoria c ON
-    p.categoria_id = c.id;";
+    $sql = "SELECT p.*, c.descricao FROM tbl_produto p
+            INNER JOIN tbl_categoria c ON
+            p.categoria_id = c.id;";
 
-$resultado = mysqli_query($conexao, $sql);
+    $resultado = mysqli_query($conexao, $sql);
 
-// TESTE DE SELEÇÃO DE DADOS:
-// var_dump($resultado);
-// exit;
+    //TESTE DE SELEÇÃO DE DADOS:
+    // var_dump($resultado);exit;
+
 ?>
 
 <!DOCTYPE html>
@@ -37,81 +37,88 @@ $resultado = mysqli_query($conexao, $sql);
 
             <!-- BOTÕES DE INSERÇÃO DE PRODUTOS E CATEGORIAS -->
             <!-- CASO O USUÁRIO ESTEJA LOGADO EXIBE OS BOTÕES DE CADASTRO -->
-
-            <header>
-                <button onclick="javascript:window.location.href ='./novo/'">Novo Produto</button>
-                <button onclick="javascript:window.location.href ='../categorias/'">Adicionar Categoria</button>
-            </header>
+    
+                <header>
+                    <button onclick="javascript:window.location.href ='./novo/'">Novo Produto</button>
+                    <button onclick="javascript:window.location.href ='../categorias/'">Adicionar Categoria</button>
+                </header>
 
             <main>
 
                 <!-- LISTAGEM DE PRODUTOS (INICIO) -->
 
                 <?php
+                
+                    while ($produto = mysqli_fetch_array($resultado)) {
+                        // var_dump($produto);exit;
+                        $valor = $produto["valor"];
+                        $desconto = $produto["desconto"];
 
-                while ($produto = mysqli_fetch_array($resultado)) {
 
-                    $valor = $produto["valor"];
-                    $desconto = $produto["desconto"];
+                        $valorDesconto = 0;
 
-                    $valorDesconto;
+                        if ($desconto > 0) {
+                            
+                            $valorDesconto = ($desconto / 100) * $valor;
+                            
 
-                    if ($desconto > 0) {
+                        }
 
-                        $valorDesconto = ($desconto / 100) * $valor;
+                        $qtdParcelas = $valor > 1000 ? 12 : 6;
 
-                        $valor -= $valorDesconto;
-                    }
+                        $valorComDesconto = $valor - $valorDesconto;
+                        // $valor = $valor - $valorDesconto;
+                        // $valor -= $valorDesconto;
 
-                    $qtdParcelas = $valor > 1000 ? 12 : 6;
+                        $valorParcela = $valorComDesconto / $qtdParcelas;
 
-                    $valorParcela = number_format($valor / $qtdParcelas, 2, ',', '.');
                 ?>
 
-                    <article class="card-produto">
+                <article class="card-produto">
 
-                        <div class="acoes-produtos">
-                            <img onclick="javascript: window.location = './editar/?id=<?= $produto['id'] ?>'" src="../imgs/edit.svg" />
-                            <img onclick="deletar(<?= $produto['id'] ?>)" src="../imgs/trash.svg" />
-                        </div>
+                    <div class="acoes-produtos">
+                    <img onclick="javascript: window.location = './editar/?id=<?= $produto['id'] ?>'" src="../imgs/edit.svg" />
+                    <img onclick="deletar(<?= $produto['id'] ?>)" src="../imgs/trash.svg" />
+                    </div>
+    
+                <figure>
+                     <img src="fotos/<?php echo $produto["imagem"]?>" />
+                </figure>
 
-                        <figure>
-                            <img src="fotos/<?= $produto["imagem"] ?>" />
-                        </figure>
+                <section>
 
-                        <section>
+                    <span class="preco">
+                        R$ <?php echo number_format($valorComDesconto, 2, ',', '.'); ?>
+                        <em> <?php echo $desconto; ?> % off</em>
+                    </span>
 
-                            <span class="preco">
-                                R$<?= number_format($valor, 2, ',', '.') ?>
-                                <em><?= $desconto ?>% off</em>
-                            </span>
+                    <span class="parcelamento">ou em
+                        <em>
+                        <?php echo $qtdParcelas; ?> x R$ <?php echo number_format($valorParcela, 2, ",", ".")?> sem juros
+                        </em>
+                    </span>
 
-                            <span class="parcelamento">ou em
-                                <em>
-                                    <?= $qtdParcelas ?>X de R$<?= $valorParcela ?> sem juros
-                                </em>
-                            </span>
+                    <span class="descricao"><?php echo $produto["descricao"]?></span>
 
-                            <span class="descricao"><?= $produto["1"] ?></span>
+                    <span class="categoria">
+                        <em><?php echo $produto["descricao"]; ?></em>
+                     </span>
 
-                            <span class="categoria">
-                                <em><?= $produto["descricao"] ?></em>
-                            </span>
-
-                    </article>
+                </article>
 
                 <?php } ?>
 
-        </section>
-        <!-- LISTAGEM DE PRODUTOS (FIM) -->
+                </section>
 
-        <!-- FORM USADO PARA A EXCLUSÃO DE PRODUTOS -->
-        <form id="formDeletar" method="POST" action="./acoes.php">
-            <input type="hidden" name="acao" value="deletar" />
-            <input type="hidden" name="produtoId" id="produtoId" />
-        </form>
+                <!-- LISTAGEM DE PRODUTOS (FIM) -->
 
-        </main>
+                <!-- FORM USADO PARA A EXCLUSÃO DE PRODUTOS -->
+                <form id="formDeletar" method="POST" action="./acoes.php">
+                    <input type="hidden" name="acao" value="deletar" />
+                    <input type="hidden" name="produtoId" id="produtoId" />
+                </form>
+
+            </main>
 
         </section>
 

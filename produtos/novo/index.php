@@ -2,16 +2,23 @@
 
   session_start();
 
-  /*CONEXÃO COM O BANCO DE DADOS*/ 
+  /*
+  CONEXÃO COM O BANCO DE DADOS
+  
+  produto/novo
+  ../
+  produto/
+  ../
+  /dabase/conexao.php
+
+  */
   require('../../database/conexao.php');
 
-  /*QUERY SQL*/ 
-
+  /*QUERY SQL*/
   $sql = "SELECT * FROM tbl_categoria";
 
   /*EXECUTAR A QUERY SQL NA BASE DE DADOS*/
-
-  $resultado = mysqli_query($conexao, $sql)
+  $resultado = mysqli_query($conexao, $sql);
 
 ?>
 
@@ -44,25 +51,21 @@
 
           <ul>
 
-          <?php
-
-          // echo '<pre>';
-          // var_dump($_SESSION);
-          // echo '</pre>';exit;
-          
-            if (isset($_SESSION["erros"])) {
-              
-              foreach ($_SESSION["erros"] as $erro) {
+            <?php
+            
+              if (isset($_SESSION["erros"])) {
                 
-                echo "<li> $erro </li>";
-          
+                foreach ($_SESSION["erros"] as $erro) {
+                  
+                  echo "<li> $erro </li>";
+
+                }
+
+                unset($_SESSION["erros"]);
+
               }
-
-            unset($_SESSION["erros"]);
-
-            }
-
-          ?>
+            
+            ?>
 
           </ul>
 
@@ -106,16 +109,16 @@
             <label for="categoria">Categoria</label>
             <select id="categoria" name="categoria" >
               <option value="">SELECIONE</option>
-
-
-              <!-- INICIO DA LISTAGEM DE CATEGORIAS VINDAS DO BANCO -->
-              <?php 
-                while ($categoria = mysqli_fetch_array($resultado)) {
-
-              ?>
-              <option value="<?php echo $categoria ["id"]?>"><?php echo $categoria ["descricao"]?></option>
-              <?php } ?>
-              <!-- FIM DA LISTAGE, -->
+        
+                <!-- INICIO DA LISTAGEM DE CATEGORIAS VINDAS DO BANCO -->
+                <?php
+                
+                  while ($categoria = mysqli_fetch_array($resultado)) {
+   
+                ?>
+                <option value="<?php echo $categoria["id"]?>"><?php echo $categoria["descricao"]?></option>
+                <?php } ?>
+                <!-- FIM DA LISTAGEM DE CATEGORIAS VINDAS DO BANCO -->
               
             </select>
 
