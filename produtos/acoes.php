@@ -46,7 +46,7 @@
 
         }
 
-        //VALIDAÇÃO DE COR
+        //VALIDAÇÃO DE TAMANHO
         if ($_POST["tamanho"] == "" || !isset($_POST["tamanho"])) {
             
             $erros[] = "O CAMPO TAMANHO É OBRIGATÓRIO";
@@ -193,9 +193,23 @@
 
         case "editar":
 
+            $produtoId = $_POST["produtoId"];
+
+        // PROCESSO DE VALIDAÇÃO
+            $erros = validarCampos();
+
+            if (count($erros) > 0) {
+                
+                $_SESSION["erros"] = $erros;
+
+                header("location: editar/index.php?id=$produtoId");
+
+                exit;
+
+            }
+
             /** ATUALIZANDO A IMAGEM DO PRODUTO **/
 
-            $produtoId = $_POST["produtoId"];
 
             if($_FILES["foto"]["error"] != UPLOAD_ERR_NO_FILE){
 
@@ -204,9 +218,26 @@
                 $resultado = mysqli_query($conexao, $sqlImagem);
                 $produto = mysqli_fetch_array($resultado);
 
-                echo $_FILES["foto"]["name"];
-                echo '/fotos/' . $produto["imagem"];exit;
+                // echo $_FILES["foto"]["name"];
+                // echo '<br />';
+                // echo '/fotos/' . $produto["imagem"];
+                // exit;
 
+                //EXCLUSÃO DA FOTO (ARQUIVO) ANTIGA DA PASTA
+                unlink("./fotos/" . $produto["imagem"]);
+
+                //RECUPERA O NOME ORIGINAL DA IMAGEM E ARMAZENA NA VARIÁVEL
+                $nomeArquivo = $_FILES["foto"]["name"];
+
+                //EXTRAI A EXTENSÃO DO AQUIVO DE IMAGEM
+                $extensao = pathinfo($nomeArquivo, PATHINFO_EXTENSION);
+
+                //DEFINE UM NOME ALEATORIO PARA A IMAGEM QUE SERÁ ARMAZENA
+                //NA PASTA "fotos"
+                $novoNomeArquivo = md5(microtime()) . ".$extensao";
+
+                //REALIZAMOS O UPLOAD DA IMAGEM COM O NOVO NOME
+                move_uploaded_file($_FILES["foto"]["tmp_name"], "fotos/$novoNomeArquivo");
 
             }
 
@@ -227,8 +258,28 @@
             $categoriaId = $_POST["categoria"];
 
 
+            /** MONTAGEM E EXECUÇÃO DA INSTRUÇÃO SQL DE UPDATE **/
 
+            $sqlUpdate = "UPDATE tbl_produto SET 
+                          descricao = '$descricao',
+                          peso = $peso,
+                          quantidade = $quantidade,
+                          cor = '$cor',
+                          tamanho = '$tamanho',
+                          valor = $valor,
+                          desconto = $desconto,
+                          categoria_id = $categoriaId";
 
+            //Verifica se tem imagem nova para atualizar
+            $sqlUpdate .= isset($novoNomeArquivo) ? ", imagem = '$novoNomeArquivo'" : "";
+
+            $sqlUpdate .= " WHERE id = $produtoId"; 
+
+            // echo $sqlUpdate; exit;
+
+            $resultado = mysqli_query($conexao, $sqlUpdate);
+
+            header("location: index.php");
 
         break;
         
